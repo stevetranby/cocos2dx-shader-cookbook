@@ -1,5 +1,5 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
+#include "ExampleBase.h"
 
 USING_NS_CC;
 
@@ -26,8 +26,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
-    if(!glview) {
-        glview = GLViewImpl::create("My Game");
+    if(! glview) {
+        glview = GLViewImpl::create("Cocos2d-x Cookbook");
         director->setOpenGLView(glview);
     }
 
@@ -38,7 +38,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = ExampleBase::scene();
 
     // run
     director->runWithScene(scene);

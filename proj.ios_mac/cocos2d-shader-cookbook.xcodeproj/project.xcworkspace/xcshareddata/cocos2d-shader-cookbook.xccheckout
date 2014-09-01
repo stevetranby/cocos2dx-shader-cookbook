@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>E3A2C437-0D0E-4C6D-AF34-3A377ED51D80</string>
+	<key>IDESourceControlProjectName</key>
+	<string>cocos2d-shader-cookbook</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>C74F5176C7D16AB9F9F8E607AB948F9ECC1EBFED</key>
+		<string>https://github.com/stevetranby/cocos2dx-shader-cookbook.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>proj.ios_mac/cocos2d-shader-cookbook.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>C74F5176C7D16AB9F9F8E607AB948F9ECC1EBFED</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/stevetranby/cocos2dx-shader-cookbook.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>C74F5176C7D16AB9F9F8E607AB948F9ECC1EBFED</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C74F5176C7D16AB9F9F8E607AB948F9ECC1EBFED</string>
+			<key>IDESourceControlWCCName</key>
+			<string>cocos2dx-shader-cookbook</string>
+		</dict>
+	</array>
+</dict>
+</plist>
