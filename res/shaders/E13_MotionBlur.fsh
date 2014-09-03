@@ -1,5 +1,7 @@
 uniform vec2 u_BlurVector;
 
+varying vec2 cc_FragTexCoord1;
+
 void main(){
 	const int nSamples = 8;
 	

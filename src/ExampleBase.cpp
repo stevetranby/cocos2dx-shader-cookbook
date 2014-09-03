@@ -7,7 +7,6 @@
 //
 
 #include "ExampleBase.h"
-#include <CocosGUI.h>
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -46,11 +45,8 @@ bool ExampleBase::init()
         return false;
     }
 
-    auto titleLabel = Label::createWithSystemFont("this getExampleName", "Helvetica", 18);
-    titleLabel->setNormalizedPosition(Vec2(0.5, 0.9));
-    this->addChild(titleLabel);
-
     auto prev = Text::create("Prev", "Helvectica", 48);
+    prev->setColor(Color3B::BLACK);
     prev->setNormalizedPosition(Vec2(0.25, 0.1));
     prev->setTouchScaleChangeEnabled(true);
     prev->setTouchEnabled(true);
@@ -73,6 +69,7 @@ bool ExampleBase::init()
     this->addChild(prev);
 
     auto next = Text::create("Next", "Helvectica", 48);
+    next->setColor(Color3B::BLACK);
     next->setNormalizedPosition(Vec2(0.75, 0.1));
     next->setTouchScaleChangeEnabled(true);
     next->setTouchEnabled(true);
@@ -104,17 +101,15 @@ bool ExampleBase::init()
     _exampleSprite->setColor(Color3B(Color4F(1.0,1.0,0.5,1.0)));
     this->addChild(_exampleSprite);
 
-    _examples.push_back( { "E01_SimplestShader", "Simple" } );
-    _examples.push_back( { "E02_SpriteColor", "Sprite Color" } );
-    _examples.push_back( { "E03_SpriteDistort", "Sprite Distort" } );
-    _examples.push_back( { "E04_Grayscale", "Grayscale" } );
-    _examples.push_back( { "E05_Chromatic", "Chromatic" } );
-    _examples.push_back( { "E06_Shadow", "Shadow" } );
-    _examples.push_back( { "E07_ColorFlash", "Color Flash" } );
-    _examples.push_back( { "E08_Outline", "Outline" } );
-    _examples.push_back( { "E09_Static", "Static Noise" } );
-    _examples.push_back( { "E10_Water", "Water (MultiTexture)", "res/Caustic.png", "res/BisectionNoise.png" });
+    _titleLabel = Label::createWithSystemFont("Example Name", "Arial", 18);
+    _titleLabel->setColor(Color3B::BLACK);
+    _titleLabel->setNormalizedPosition(Vec2(0.5, 0.9));
+    this->addChild(_titleLabel);
+
+
     _currentIndex = 0;
+    setupExamples();
+    setupGUI();
     refreshShader();
 
     return true;
@@ -129,9 +124,17 @@ void ExampleBase::refreshShader()
     _exampleSprite->setTexture("res/Logo-hd.png");
 
     auto shaderInfo = _examples.at(_currentIndex);
+    _titleLabel->setString(shaderInfo.title);
 
-    auto vertFilename = std::string("res/shaders/").append(shaderInfo.name).append(".vsh");
-    auto fragFilename = std::string("res/shaders/").append(shaderInfo.name).append(".fsh");
+    // REFERENCE
+    // Load the fragment shader in the file name E01_SimplestShader.fsh.
+	// Also loads E01_SimplestShader.vsh as the vertex shader if it exists.
+	//sprite.shader = [CCShader shaderNamed:self.shaderName];
+
+
+    // TODO: use a default template shader if none specified
+    auto vertFilename = std::string("res/shaders/").append(shaderInfo.vertexShader).append(".vsh");
+    auto fragFilename = std::string("res/shaders/").append(shaderInfo.fragmentShader).append(".fsh");
 
     CCLOG("refresh shader with files: %s, %s", vertFilename.c_str(), fragFilename.c_str());
 
@@ -153,6 +156,8 @@ void ExampleBase::refreshShader()
         if(tex1) {
             // TODO: should store in shaderinfo
             _exampleSprite->setTexture("res/Rocks-hd.png");
+            // TODO: test trying to use default Texture1
+            // TODO: convert shader and ShaderInfo property to u_Custom_Texture1
             glprogramstate->setUniformTexture("u_CausticTexture", tex1);
         }
 
@@ -165,6 +170,7 @@ void ExampleBase::refreshShader()
             Texture2D::TexParams texParams = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
             tex2->setTexParameters(texParams);
 
+            // TODO: convert shader and ShaderInfo property to Custom_Texture2 or u_Noise_Texture
             auto locid = glprogram->getUniformLocationForName("uNoiseTextureSize");
             glprogram->setUniformLocationWith2f(locid, 30, 30);
             glprogramstate->setUniformVec2("u_NoiseTextureSize", tex2->getContentSizeInPixels());
@@ -177,209 +183,430 @@ void ExampleBase::refreshShader()
     _exampleSprite->setGLProgram(glprogram);
 }
 
-//std::string ExampleBase::exampleName()
-//{
-//    std::string name("Steve");
-////    auto className =
-////    NSString *className = NSStringFromClass(self.class);
-////
-////    NSUInteger i = 0;
-////    NSMutableString *name = [NSMutableString stringWithCapacity:0];
-////
-////    for(; i < className.length; i++){
-////        unichar c = [className characterAtIndex:i];
-////        if(c == '_'){
-////            [name appendString:@": "];
-////
-////            i++;
-////            break;
-////        } else {
-////            [name appendString:[NSString stringWithCharacters:&c length:1]];
-////        }
-////    }
-////
-////    for(; i < className.length; i++){
-////        unichar c = [className characterAtIndex:i];
-////        if('A' <= c && c <= 'Z'){
-////            [name appendString:@" "];
-////        }
-////
-////        [name appendString:[NSString stringWithCharacters:&c length:1]];
-////    }
-//
-//    return name;
-//}
-//
-////-(CCNode *)ExampleBase::exampleContent
-////{
-////    NSAssert(NO, @"Override me!");
-////    return nil;
-////}
-////
-////-(NSString *)ExampleBase::shaderName
-////{
-////    return NSStringFromClass(self.class);
-////}
-////
-////-(NSString *)ExampleBase::sourceString
-////{
-////    NSString *shaderName = self.shaderName;
-////
-////    NSString *fragmentName = [shaderName stringByAppendingPathExtension:@"fsh"];
-////    NSString *fragmentPath = [[CCFileUtils sharedFileUtils] fullPathForFilename:fragmentName];
-////    NSAssert(fragmentPath, @"Failed to find '%@'.", fragmentName);
-////    NSString *fragmentSource = [NSString stringWithContentsOfFile:fragmentPath encoding:NSUTF8StringEncoding error:nil];
-////
-////    NSString *vertexName = [shaderName stringByAppendingPathExtension:@"vsh"];
-////    NSString *vertexPath = [[CCFileUtils sharedFileUtils] fullPathForFilename:vertexName];
-////    NSString *vertexSource = (vertexPath ? [NSString stringWithContentsOfFile:vertexPath encoding:NSUTF8StringEncoding error:nil] : @"... Default Vertex Shader. Don't worry about it yet.");
-////
-////    return [NSString stringWithFormat:@"VERTEX SHADER:\n\n%@\n\nFRAGMENT SHADER:\n\n%@\n", vertexSource, fragmentSource];
-////}
-////
-////-(CCLabelTTF *)sourceLabel
-////{
-////    CCLabelTTF *label = [CCLabelTTF labelWithString:self.sourceString fontName:@"Helvetica" fontSize:12.0];
-////    label.color = [CCColor blackColor];
-////
-////    return label;
-////}
-////
-////@end
-////
-////
-////@implementation ExampleSlider
-////
-////+(instancetype)ExampleSlider::sliderNamed:(NSString *)name
-////{
-////    return [[self alloc] initWithName:name];
-////}
-////
-////-(id)ExampleSlider::initWithName:(NSString *)name
-////{
-////    CCSpriteFrame *bg = [CCSpriteFrame frameWithImageNamed:@"slider-background.png"];
-////    CCSpriteFrame *handle = [CCSpriteFrame frameWithImageNamed:@"slider-handle.png"];
-////
-////    if((self = [super initWithBackground:bg andHandleImage:handle])){
-////        self.preferredSize = CGSizeMake(100, bg.originalSize.height);
-////
-////        [self setTarget:self selector:@selector(callback:)];
-////        self.continuous = YES;
-////
-////        CCLabelTTF *label = [CCLabelTTF labelWithString:[name stringByAppendingString:@":"] fontName:@"Helvetica" fontSize:12];
-////        label.color = [CCColor blackColor];
-////        label.anchorPoint = ccp(1.0, 0.5);
-////        label.positionType = CCPositionTypeNormalized;
-////        label.position = ccp(-0.1, 0.5);
-////
-////        [self addChild:label];
-////    }
-////
-////    return self;
-////}
-////
-////@end
-////
-////
-////@implementation FloatSlider {
-////    CCLabelTTF *_valueLabel;
-////}
-////
-////-(id)FloatSlider::initWithName:(NSString *)name
-////{
-////    if((self = [super initWithName:name])){
-////        self.startValue = 0.0f;
-////        self.endValue = 1.0f;
-////
-////        _valueLabel = [CCLabelTTF labelWithString:@"" fontName:@"Helvetica" fontSize:12];
-////        _valueLabel.color = [CCColor blackColor];
-////        _valueLabel.anchorPoint = ccp(0.0, 0.5);
-////        _valueLabel.positionType = CCPositionTypeNormalized;
-////        _valueLabel.position = ccp(1.1, 0.5);
-////
-////        [self addChild:_valueLabel];
-////    }
-////
-////    return self;
-////}
-////
-////-(void)FloatSlider::callback:(CCSlider *)slider
-////{
-////    float alpha = slider.sliderValue;
-////    float value = (1.0f - alpha)*self.startValue + alpha*self.endValue;
-////    _valueLabel.string = [NSString stringWithFormat:@"%.2f", value];
-////
-////    if(_valueBlock) _valueBlock(value);
-////        }
-////
-////-(void)FloatSlider::setStartValue:(float)startValue
-////{
-////    _startValue = startValue;
-////    [self callback:self];
-////}
-////
-////-(void)FloatSlider::setEndValue:(float)endValue
-////{
-////    _endValue = endValue;
-////    [self callback:self];
-////}
-////
-////-(void)FloatSlider::setValueBlock:(void (^)(float))valueBlock
-////{
-////    _valueBlock = valueBlock;
-////    [self callback:self];
-////}
-////
-////@end
-////
-////
-////@implementation ColorSlider {
-////    CCNodeGradient *_gradient;
-////}
-////
-////-(id)ColorSlider::initWithName:(NSString *)name
-////{
-////    if((self = [super initWithName:name])){
-////        self.startColor = [CCColor whiteColor];
-////        self.endColor = [CCColor blackColor];
-////
-////        _gradient = [CCNodeGradient nodeWithColor:self.startColor fadingTo:self.endColor alongVector:ccp(-1, 0)];
-////        _gradient.contentSizeType = CCSizeTypeNormalized;
-////        _gradient.contentSize = CGSizeMake(1.0, 1.0);
-////
-////        [self addChild:_gradient z:-1];
-////    }
-////
-////    return self;
-////}
-////
-////void ColorSlider::callback(CCSlider *slider)
-////{
-////    if(_colorBlock) _colorBlock([_startColor interpolateTo:_endColor alpha:self.sliderValue]);
-////        }
-////
-////void ColorSlider::setStartColor:(CCColor *startColor)
-////{
-////    _startColor = startColor;
-////    [self callback:self];
-////
-////    _gradient.startColor = startColor;
-////    _gradient.startOpacity = startColor.alpha;
-////}
-////
-////void ColorSlider::setEndColor:(CCColor *endColor)
-////{
-////    _endColor = endColor;
-////    [self callback:self];
-////
-////    _gradient.endColor = endColor;
-////    _gradient.endOpacity = endColor.alpha;
-////}
-//
-////void ColorSlider::setColorBlock:(void (^)(CCColor *))colorBlock)
-////{
-////    _colorBlock = colorBlock;
-////    [self callback:self];
-////}
-//
-//@end
+void ExampleBase::setupExamples()
+{
+    _examples.push_back( {
+        "Simple",
+        "E01_SimplestShader",
+        "E01_SimplestShader"
+    } );
+    _examples.push_back( {
+        "Sprite Color",
+        "E02_SpriteColor",
+        "E02_SpriteColor"
+    } );
+    _examples.push_back( {
+        "Sprite Distort",
+        "E03_SpriteDistort",
+        "E03_SpriteDistort"
+    } );
+    _examples.push_back( {
+        "Grayscale",
+        "E04_Grayscale",
+        "E04_Grayscale"
+    } );
+    _examples.push_back( {
+        "Chromatic",
+        "E05_Chromatic",
+        "E05_Chromatic"
+    } );
+    _examples.push_back( {
+        "Shadow",
+        "E06_Shadow",
+        "E06_Shadow"
+    } );
+    _examples.push_back( {
+        "Color Flash",
+        "E07_ColorFlash",
+        "E07_ColorFlash"
+    } );
+    _examples.push_back( {
+        "Outline",
+        "E08_Outline",
+        "E08_Outline"
+    } );
+    _examples.push_back( {
+        "Static Noise",
+        "E09_Static",
+        "E09_Static"
+    } );
+    _examples.push_back( {
+        "Water (MultiTexture)",
+        "E10_Water",
+        "E10_Water",
+        "res/Caustic.png",
+        "res/BisectionNoise.png"
+    });
+    _examples.push_back( {
+        "Diffusion",
+        "E11_Diffusion",
+        "E11_Diffusion"
+    } );
+    _examples.push_back( {
+        "Color Matrix",
+        "E12_ColorMatrix",
+        "E12_ColorMatrix"
+    } );
+    _examples.push_back( {
+        "Motion Blur",
+        "E13_MotionBlur",
+        "E13_MotionBlur"
+    } );
+    _examples.push_back( {
+        "Flag (Ripped)",
+        "E14_Flag",
+        "E14_Flag"
+    } );
+    _examples.push_back( {
+        "Distance Field",
+        "E15_SignedDistanceField",
+        "E15_SignedDistanceField"
+    } );
+    _examples.push_back( {
+        "Meta Particles",
+        "E16_MetaParticles",
+        "E16_MetaParticles"
+    } );
+}
+
+
+void ExampleBase::setupGUI()
+{
+    auto frameCache = SpriteFrameCache::getInstance();
+    frameCache->addSpriteFramesWithFile("interface-hd.plist");
+
+    auto sliderLabel = Label::createWithTTF("Slider Value", "Helvetica", 24);
+    _slider = ui::Slider::create();
+    _sliderFloat = ui::Slider::create();
+
+    _slider->loadBarTexture("slider-background.png", TextureResType::PLIST);
+    _slider->loadSlidBallTextureNormal("slider-handle.png", TextureResType::PLIST);
+    //_slider->setContentSize(Size(100, bg->getOriginalSize().height));
+
+    _slider->addEventListener([this](Ref* senderRef, Slider::EventType eventType) {
+        //call callback of subclass
+    });
+        //self.continuous = YES;
+
+    auto label = Label::createWithTTF("[name]", "Helvetica", 12);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2(1.0, 0.5));
+    label->setNormalizedPosition(Vec2(-0.1, 0.5));
+    _slider->addChild(label);
+
+
+
+    // Another Slider
+    _sliderFloat = Slider::create();
+    _sliderFloat->addEventListener([this](Ref* senderRef, Slider::EventType eventType) {
+        float alpha = _sliderFloat->getPercent() / 100.0f;
+        float value = (1.0f - alpha) * _sliderFloat->getPercent()/100.0f + alpha * _sliderFloat->getPercent()/100.0f;
+        _sliderFloatValueLabel->setString(StringUtils::format("%.2f", value));
+        // TODO: allow setting callback
+//        if(_valueBlock) {
+//            _valueBlock(value);
+//        }
+    });
+
+    _sliderFloatValueLabel = Label::createWithTTF("", "Helvetica", 12);
+    _sliderFloatValueLabel->setColor(Color3B::BLACK);
+    _sliderFloatValueLabel->setAnchorPoint(Vec2(0.0, 0.5));
+    _sliderFloatValueLabel->setNormalizedPosition(Vec2(1.1, 0.5));
+    _sliderFloat->addChild(_sliderFloatValueLabel];
+
+
+void ExampleBase::setupSliderWithName(const std::string& name)
+    {
+        if((self = [super initWithName:name])){
+            self.startColor = [CCColor whiteColor];
+            self.endColor = [CCColor blackColor];
+
+            _gradient = [CCNodeGradient nodeWithColor:self.startColor fadingTo:self.endColor alongVector:ccp(-1, 0)];
+            _gradient.contentSizeType = CCSizeTypeNormalized;
+            _gradient.contentSize = CGSizeMake(1.0, 1.0);
+
+            [self addChild:_gradient z:-1];
+        }
+
+        return self;
+    }
+
+    void ExampleBase::callback(CCSlider *slider)
+    {
+        if(_colorBlock) _colorBlock([_startColor interpolateTo:_endColor alpha:self.sliderValue]);
+    }
+
+    void ExampleBase::setStartColor:(CCColor *startColor)
+    {
+        _startColor = startColor;
+        [self callback:self];
+        _gradient.startColor = startColor;
+        _gradient.startOpacity = startColor.alpha;
+    }
+    
+    void ExampleBase::setEndColor:(CCColor *endColor)
+    {
+        _endColor = endColor;
+        [self callback:self];
+        _gradient.endColor = endColor;
+        _gradient.endOpacity = endColor.alpha;
+    }
+
+void ExampleBase::setupExample2()
+{
+    ColorSlider *slider = [ColorSlider sliderNamed:@"Tint Color"];
+	slider.positionType = CCPositionTypeNormalized;
+	slider.position = ccp(0.5, 0.25);
+	slider.anchorPoint = ccp(0.5, 0.5);
+	slider.endColor = [CCColor magentaColor];
+	slider.colorBlock = ^(CCColor *color){sprite.color = color;};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:slider];
+	[content addChild:sprite];
+}
+
+void ExampleBase::setupExample7()
+{
+    ColorSlider *flashSlider = [ColorSlider sliderNamed:@"Flash Color"];
+	flashSlider.startColor = [CCColor colorWithRed:1 green:0 blue:0 alpha:0];
+	flashSlider.endColor = [CCColor redColor];
+	flashSlider.colorBlock = ^(CCColor *color){sprite.shaderUniforms[@"u_ColorFlash"] = color;};
+
+	ColorSlider *tintSlider = [ColorSlider sliderNamed:@"Tint Color"];
+	tintSlider.endColor = [CCColor colorWithRed:1 green:1 blue:1 alpha:0];
+	tintSlider.colorBlock = ^(CCColor *color){sprite.colorRGBA = color;};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:tintSlider];
+	[content addChild:flashSlider];
+	[content addChild:sprite];
+}
+void ExampleBase::setupExample8()
+{
+    olorSlider *colorSlider = [ColorSlider sliderNamed:@"Outline Color"];
+	colorSlider.startColor = [CCColor colorWithRed:0 green:0 blue:1 alpha:1];
+	colorSlider.endColor = [CCColor colorWithRed:0 green:0 blue:1 alpha:0];
+	colorSlider.colorBlock = ^(CCColor *color){sprite.colorRGBA = color;};
+
+	FloatSlider *widthSlider = [FloatSlider sliderNamed:@"Outline Width"];
+	widthSlider.endValue = 3.0;
+	widthSlider.sliderValue = 1.0;
+	widthSlider.valueBlock = ^(float value){sprite.shaderUniforms[@"u_OutlineWidth"] = @(value);};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:widthSlider];
+	[content addChild:colorSlider];
+	[content addChild:sprite];
+}
+
+void ExampleBase::setupExample9()
+{
+    CCTexture *noise = [CCTexture textureWithFile:@"gaussianNoise.png"];
+	noise.texParameters = &(ccTexParams){GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT};
+	sprite.shaderUniforms[@"u_NoiseTexture"] = noise;
+
+	FloatSlider *noiseSlider = [FloatSlider sliderNamed:@"Amount"];
+	noiseSlider.sliderValue = 1.0;
+	noiseSlider.valueBlock = ^(float value){sprite.shaderUniforms[@"u_NoiseAmount"] = [NSNumber numberWithFloat:value];};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:noiseSlider];
+	[content addChild:sprite];
+}
+
+void ExampleBase::setupExample10()
+{
+    sprite.shaderUniforms[@"u_CausticTexture"] = [CCTexture textureWithFile:@"Caustic.png"];
+
+	CCTexture *noise = [CCTexture textureWithFile:@"BisectionNoise.png"];
+	noise.texParameters = &(ccTexParams){GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+	sprite.shaderUniforms[@"u_NoiseTexture"] = noise;
+}
+void ExampleBase::setupExample11()
+{
+    // Load the distortion texture, a noise texture which we use to determine how to offset individual fragments when we draw them.
+	CCTexture* noise = [CCTexture textureWithFile:@"gaussianNoise.png"];
+	// Nearest neighboor interpolating to create a pixely effect out of the distortion texture.
+	noise.texParameters = &(ccTexParams){GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT};
+
+	sprite.shaderUniforms[@"u_NoiseTexture"] = noise;
+
+	FloatSlider *blurSlider = [FloatSlider sliderNamed:@"Radius"];
+	blurSlider.endValue = 10.0f;
+	blurSlider.sliderValue = 0.5;
+	blurSlider.valueBlock = ^(float value){sprite.shaderUniforms[@"u_Radius"] = @(value);};
+
+	FloatSlider *animationSlider = [FloatSlider sliderNamed:@"Animation"];
+	animationSlider.sliderValue = 1.0;
+	// Round the number so it's on or off. 0 will disable the animation, 1 will enable it.
+	animationSlider.valueBlock = ^(float value){sprite.shaderUniforms[@"u_AnimationEnabled"] = @(roundf(value));};
+
+	FloatSlider *blockSizeSlider = [FloatSlider sliderNamed:@"BlockSize"];
+	blockSizeSlider.startValue = 1.0f;
+	blockSizeSlider.endValue = 256.0f;
+	blockSizeSlider.valueBlock = ^(float value){sprite.shaderUniforms[@"u_BlockSize"] = @(floorf(value));};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:blockSizeSlider];
+	[content addChild:animationSlider];
+	[content addChild:blurSlider];
+	[content addChild:sprite];
+}
+
+void ExampleBase::setupExample12()
+{
+    float _colorRotation;
+	float _colorScale;
+	float _saturationAdjustment;
+	CCSprite *_sprite;
+
+
+    _colorRotation = 0.0f;
+	_colorScale = 1.0f;
+	_saturationAdjustment = 1.0f;
+
+	_sprite = [CCSprite spriteWithImageNamed:@"Logo.png"];
+	_sprite.shader = [CCShader shaderNamed:self.shaderName];
+
+	_sprite.shaderUniforms[@"u_ColorMatrix"] = [NSValue valueWithGLKMatrix4:GLKMatrix4Identity];
+
+	FloatSlider *hueRotation = [FloatSlider sliderNamed:@"Hue Rotation"];
+	hueRotation.startValue = 0.0f;
+	hueRotation.endValue = 360.0f;
+	hueRotation.valueBlock = ^(float value){
+		_colorRotation = value*M_PI/180.0f;
+		[self updateColors];
+	};
+
+	FloatSlider *colorScaleSlider = [FloatSlider sliderNamed:@"Exposure"];
+	colorScaleSlider.endValue = 2.0f;
+	colorScaleSlider.sliderValue = 0.5f;
+	colorScaleSlider.valueBlock = ^(float value){
+		_colorScale = value;
+		[self updateColors];
+	};
+
+
+	FloatSlider *saturationSlider = [FloatSlider sliderNamed:@"Saturation"];
+	saturationSlider.endValue = 2.0f;
+	saturationSlider.sliderValue = 0.5f;
+	saturationSlider.valueBlock = ^(float value){
+		_saturationAdjustment = value;
+		[self updateColors];
+	};
+
+	CCLayoutBox *content = [CCLayoutBox node];
+	content.anchorPoint = ccp(0.5, 0.5);
+	content.direction = CCLayoutBoxDirectionVertical;
+
+	[content addChild:saturationSlider];
+	[content addChild:colorScaleSlider];
+	[content addChild:hueRotation];
+	[content addChild:_sprite];
+}
+
+void ExampleBase::setupExample13()
+{
+    CCSprite * _sprite;
+	float _blurStrength;
+
+    // exampleContent
+
+	_sprite = [CCSprite spriteWithImageNamed:@"Logo.png"];
+	_sprite.shader = [CCShader shaderNamed:self.shaderName];
+
+
+    // TODO: If you add the _sprite (and slider) to content node, the _sprite no longer moves.
+    /*
+     ColorSlider *blurStrengthSlider = [ColorSlider node];
+     blurStrengthSlider.sliderValue = 0.5f;
+     blurStrengthSlider.startColor = [CCColor colorWithRed:0 green:0 blue:0 alpha:0];
+     blurStrengthSlider.endColor = [CCColor colorWithRed:1 green:1 blue:1 alpha:1];
+     blurStrengthSlider.colorBlock = ^(CCColor *color){
+     _blurStrength = color.red * 10000.0;
+     };
+
+     CCNode *content = [CCNode node];
+     //content.contentSize = CGSizeMake(100.0f, 100.0f);
+     blurStrengthSlider.position = ccp(-200, -300);
+
+     [content addChild:blurStrengthSlider];
+     [content addChild:_sprite];
+     */
+
+    -(void)update:(CCTime)delta
+    {
+        [super update:delta];
+
+        CGPoint previousPosition = _sprite.position;
+
+        _sprite.position = ccp(0.5, 0.5);
+        _sprite.position = ccpAdd(_sprite.position, ccp(sinf(self.time * 2.0) / 10.0, cosf(self.time * 3.0) / 10.0));
+
+        // To find the amount we moved this frame, we can subtract our new position from the previous position...
+        CGPoint blurVector = ccpSub(_sprite.position, previousPosition);
+
+        // Cocos2D flips the y axis.
+        blurVector.y = -blurVector.y;
+
+        // Divide by the delta time to avoid inconsistent trail lengths when framerate is inconsistent. And multiply by blur strength.s
+        blurVector = CGPointMake(blurVector.x / delta * _blurStrength, blurVector.y / delta * _blurStrength);
+
+        CGPoint p = CGPointMake(blurVector.x / _sprite.texture.contentSize.width, blurVector.y / _sprite.texture.contentSize.height);
+        _sprite.shaderUniforms[@"u_BlurVector"] = [NSValue valueWithCGPoint:p];
+    }
+
+}
+
+void ExampleBase::setupExample14()
+{
+    CCTexture *noise = [CCTexture textureWithFile:@"BisectionNoise.png"];
+	noise.texParameters = &(ccTexParams){GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+	sprite.shaderUniforms[@"u_NoiseTexture"] = noise;
+}
+void ExampleBase::setupExample15()
+{
+    [sprite runAction:[CCActionRepeatForever actionWithAction:[CCActionSequence actions:
+                                                            [CCActionScaleTo actionWithDuration:2 scale:4],
+                                                            [CCActionScaleTo actionWithDuration:2 scale:1],
+                                                            nil
+                                                            ]]];
+}
+
+void ExampleBase::setupExample15()
+{
+    CCRenderTexture *rt = [CCRenderTexture renderTextureWithWidth:size.width height:size.height];
+	rt.autoDraw = YES;
+	rt.clearColor = [CCColor clearColor];
+	rt.clearFlags = GL_COLOR_BUFFER_BIT;
+	rt.sprite.shader = [CCShader shaderNamed:self.shaderName];
+
+	// Run the render texture at a low resolution.
+	// No need to waste fillrate on a smooth effect.
+	rt.contentScale = 0.5;
+
+	// This is currently a private method, thus the private header above.
+	// Render textures default to using nearest neighbor (aliased/blocky) filtering.
+	// The effect will look really crummy if it's blocky.
+	rt.texture.antialiased = YES;
+
+	CCParticleSystem *particles = [CCParticleSystem particleWithFile:@"Fog.plist"];
+	particles.position = ccp(size.width/2, size.height/2);
+	[rt addChild:	particles];
+}

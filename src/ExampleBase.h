@@ -10,11 +10,13 @@
 #define __cocos2d_shader_cookbook__ExampleBase__
 
 #include "cocos2d.h"
+#include <CocosGUI.h>
 
 struct ShaderInfo
 {
-    std::string name;
     std::string title;
+    std::string fragmentShader;
+    std::string vertexShader;
     std::string texture1;
     std::string texture2;
 };
@@ -27,13 +29,25 @@ public:
     CREATE_FUNC(ExampleBase);
 
     void refreshShader();
+    void setupExamples();
+    void setupGUI();
+    void setupExampleBaseGUI();
+
+    void setupExample2();
 
 protected:
-    cocos2d::Label* sourceLabel;
+    cocos2d::Label* _titleLabel;
     cocos2d::Sprite* _exampleSprite;
     float _time;
     int _currentIndex;
     std::vector<ShaderInfo> _examples;
+
+    // GUI
+    cocos2d::ui::Slider* _slider;
+    cocos2d::ui::Slider* _sliderFloat;
+    cocos2d::LayerGradient* _sliderGradient;
+    cocos2d::Label* _sliderValueLabel;
+    cocos2d::Label* _sliderFloatValueLabel;
 };
 
 #endif /* defined(__cocos2d_shader_cookbook__ExampleBase__) */

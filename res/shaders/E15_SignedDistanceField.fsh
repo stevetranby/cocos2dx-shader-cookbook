@@ -1,3 +1,5 @@
+varying vec2 cc_FragTexCoord1;
+
 #ifdef GL_ES
 #extension GL_OES_standard_derivatives : enable
 #endif
@@ -12,7 +14,7 @@ const vec4 shadowColor = vec4(0, 0, 0, 0.25);
 
 vec4 distance2D(vec2 texCoord){
 	// Make the color values to go from [-1, 1].
-	return 2.0*texture2D(CC_Texture0, texCoord) - 1.0;
+	return 2.0 * texture2D(CC_Texture0, texCoord) - 1.0;
 }
 
 vec4 composite(vec4 over, vec4 under){

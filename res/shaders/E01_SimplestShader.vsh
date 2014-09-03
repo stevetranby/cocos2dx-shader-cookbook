@@ -13,6 +13,7 @@
  "uniform sampler2D CC_Texture3;\n"
  "uniform float CC_alpha_value;\n"
 
+ // Attributes you must define, but are set by cocos2d
  attribute vec4 a_position;
  attribute vec2 a_texCoord;
  attribute vec4 a_color;

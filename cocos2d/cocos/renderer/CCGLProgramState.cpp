@@ -299,7 +299,7 @@ GLProgramState::~GLProgramState()
 bool GLProgramState::init(GLProgram* glprogram)
 {
     CCASSERT(glprogram, "invalid shader");
-
+    
     _glprogram = glprogram;
     _glprogram->retain();
 
