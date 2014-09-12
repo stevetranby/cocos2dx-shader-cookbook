@@ -1,8 +1,9 @@
-varying vec2 cc_FragTexCoord1;
-
 #ifdef GL_ES
 #extension GL_OES_standard_derivatives : enable
 #endif
+
+varying vec2 cc_FragTexCoord1;
+
 
 // Premultiplied color that takes the place of red, green and blue from the SDF texture.
 const vec4 colorR = vec4(0.92, 0.39, 0.00, 1);
@@ -40,6 +41,6 @@ void main(){
 	// You can add soft drow shadows using SDFs too.
 	// Not a bad idea to calculate shadow texcoord in the vertex shader.
 	vec2 shadowOffset = vec2(0.02, 0.02);
-	mediump float shadowMask = 8.0*distance2D(cc_FragTexCoord1 - shadowOffset).r;
+	float shadowMask = 8.0*distance2D(cc_FragTexCoord1 - shadowOffset).r;
 	gl_FragColor = composite(gl_FragColor, shadowColor*(shadowMask + 1.0));
 }

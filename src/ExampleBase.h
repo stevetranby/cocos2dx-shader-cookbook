@@ -33,6 +33,10 @@ public:
     void setupGUI();
     void setupExampleBaseGUI();
 
+    //
+    void setupSliderWithName(const std::string& name);
+
+    //
     void setupExample2();
 
 protected:

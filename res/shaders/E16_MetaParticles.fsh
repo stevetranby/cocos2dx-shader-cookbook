@@ -2,6 +2,10 @@
 #extension GL_OES_standard_derivatives : enable
 #endif
 
+varying vec4 cc_FragColor;
+varying vec2 cc_FragTexCoord1;
+varying vec2 cc_FragTexCoord2;
+
 // These are premultiplied colors.
 const vec4 fillColor = vec4(0, 0, 0, 1);
 const vec4 glowColor = vec4(1, 0, 1, 1);
