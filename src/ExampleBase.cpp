@@ -188,49 +188,48 @@ void ExampleBase::setupGUI()
 //    auto frameCache = SpriteFrameCache::getInstance();
 //    frameCache->addSpriteFramesWithFile("interface-hd.plist");
 
-    _slider = ui::Slider::create();
-    _slider->loadBarTexture("res/slider-background-hd.png");
+    auto sliderBar = "res/slider-background-hd.png";
     auto sliderFilename = "res/slider-handle-hd.png";
-    _slider->loadSlidBallTextures(sliderFilename, sliderFilename, sliderFilename);
-    _slider->setScale9Enabled(true);
-    _slider->setContentSize(Size(200,30));
-    _slider->setNormalizedPosition(Vec2(0.5,0.2));
 
-    _sliderValueLabel = Label::create("[name]", "Helvetica", 12);
-    _sliderValueLabel->setColor(Color3B::BLACK);
-    _sliderValueLabel->setAnchorPoint(Vec2(1.0, 0.5));
-    _sliderValueLabel->setNormalizedPosition(Vec2(-0.1, 0.5));
-    _slider->addChild(_sliderValueLabel);
+    for(int i=0; i<3; i++) {
 
-    _slider->addEventListener([this](Ref* senderRef, Slider::EventType eventType) {
-        float alpha = _slider->getPercent() / 100.0f;
-        float value = (1.0f - alpha) * _slider->getPercent()/100.0f + alpha * _slider->getPercent()/100.0f;
-        _sliderValueLabel->setString(StringUtils::format("%.2f", value));
-        CCLOG("alpha = %f, eventType = %d", alpha, eventType);
-    });
-    this->addChild(_slider);
+        auto sliderName = StringUtils::format("slider_%d", i);
+        auto slider = ui::Slider::create();
+        slider->loadBarTexture(sliderBar);
 
-    // Another Slider
-    _sliderFloat = ui::Slider::create();
-    _sliderFloat->loadBarTexture("res/slider-background-hd.png");
-    _sliderFloat->loadSlidBallTextures(sliderFilename, sliderFilename, sliderFilename);
-    _sliderFloat->setScale9Enabled(true);
-    _sliderFloat->setContentSize(Size(200,30));
-    _sliderFloat->setNormalizedPosition(Vec2(0.5, 0.4));
+        slider->loadSlidBallTextures(sliderFilename, sliderFilename, sliderFilename);
+        slider->setScale9Enabled(true);
+        slider->setContentSize(Size(200,30));
+        slider->setNormalizedPosition(Vec2(0.5, 0.25 + 0.1 * i));
+        slider->setName(sliderName);
 
-    _sliderFloatValueLabel = Label::createWithSystemFont("", "Helvetica", 12);
-    _sliderFloatValueLabel->setColor(Color3B::BLACK);
-    _sliderFloatValueLabel->setAnchorPoint(Vec2(0.0, 0.5));
-    _sliderFloatValueLabel->setNormalizedPosition(Vec2(1.1, 0.5));
-    _sliderFloat->addChild(_sliderFloatValueLabel);
+        auto lbl = Label::create("[name]", "Helvetica", 12);
+        lbl->setColor(Color3B::BLACK);
+        lbl->setAnchorPoint(Vec2(1.0, 0.5));
+        lbl->setNormalizedPosition(Vec2(-0.1, 0.5));
+        lbl->setName(kLabelTagName);
+        slider->addChild(lbl);
 
-    _sliderFloat->addEventListener([this](Ref* senderRef, Slider::EventType eventType) {
-        float alpha = _sliderFloat->getPercent() / 100.0f;
-        float value = (1.0f - alpha) * _sliderFloat->getPercent()/100.0f + alpha * _sliderFloat->getPercent()/100.0f;
-        _sliderFloatValueLabel->setString(StringUtils::format("%.2f", value));
-        CCLOG("alpha = %f, eventType = %d", alpha, eventType);
-    });
-    this->addChild(_sliderFloat);
+        auto grad = LayerGradient::create(Color4B::WHITE, Color4B::BLACK, Vec2(-1, 0));
+        grad->setContentSize(Size(200,40));
+        slider->addChild(grad, -1);
+
+        slider->addEventListener([this](Ref* senderRef, Slider::EventType eventType) {
+            auto slider = static_cast<ui::Slider*>(senderRef);
+            auto sliderLabel = static_cast<Label*>(slider->getChildByName(kLabelTagName));
+            if(sliderLabel) {
+                float alpha = slider->getPercent() / 100.0f;
+                float value = (1.0f - alpha) * slider->getPercent()/100.0f + alpha * slider->getPercent()/100.0f;
+                sliderLabel->setString(StringUtils::format("%.2f", value));
+                CCLOG("alpha = %f, eventType = %d", alpha, eventType);
+            }
+        });
+        this->addChild(slider);
+        
+        if(i == 0) _slider1 = slider;
+        if(i == 1) _slider2 = slider;
+        if(i == 2) _slider3 = slider;
+    }
 }
 
 //void ExampleBase::setupSliderWithName(const std::string& name)

@@ -12,6 +12,8 @@
 #include "cocos2d.h"
 #include <CocosGUI.h>
 
+#define kLabelTagName "valueLabel"
+
 struct ShaderInfo
 {
     std::string title;
@@ -47,11 +49,11 @@ protected:
     std::vector<ShaderInfo> _examples;
 
     // GUI
-    cocos2d::ui::Slider* _slider;
-    cocos2d::ui::Slider* _sliderFloat;
-    cocos2d::LayerGradient* _sliderGradient;
-    cocos2d::Label* _sliderValueLabel;
-    cocos2d::Label* _sliderFloatValueLabel;
+    cocos2d::ui::Slider* _slider1;
+    cocos2d::ui::Slider* _slider2;
+    cocos2d::ui::Slider* _slider3;
+
+    // State
 };
 
 #endif /* defined(__cocos2d_shader_cookbook__ExampleBase__) */
